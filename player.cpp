@@ -41,7 +41,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      */ 
      for(int i; i < 10; i++)
      {
-		 //Small change
+		 //Change
 	 }
     return NULL;
 }
