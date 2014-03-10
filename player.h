@@ -21,6 +21,7 @@ private:
     Side mySide;
     Side opponentSide;
     Board* masterBoard;
+    Move* randomMove();
 };
 
 #endif
