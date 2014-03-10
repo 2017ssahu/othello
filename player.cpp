@@ -9,6 +9,14 @@ Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 	this->mySide = side;
+    this->opponentSide = BLACK; 
+    
+    if(side == BLACK)
+    {
+        opponentSide = WHITE;
+    }
+
+    masterBoard = new Board();
 
     /* 
      * TODO: Do any initialization you need to do here (setting up the board,
