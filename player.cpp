@@ -55,7 +55,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      */ 
      
     //Process opponent's move
-    masterBoard->doMove(opponentsMove,opponentSide);
+    masterBoard->doMove(opponentsMove, opponentSide);
     //Determine move 
     return NULL;
 }
