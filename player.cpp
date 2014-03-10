@@ -84,3 +84,14 @@ Move* Player::randomMove()
 	
 	return NULL;
 }
+
+Move* Player::simpleHeuristicMove()
+{
+	std::list<Move*>* moveList = possibleMoves();
+	std::list<Move*>*::iterator iterator;
+	
+	for (iterator = moveList->begin(); iterator != moveList->end(); iterator++)
+	{
+		
+	}
+}
