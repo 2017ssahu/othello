@@ -9,8 +9,13 @@ Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 	this->mySide = side;
+<<<<<<< HEAD
     this->opponentSide = BLACK;
      
+=======
+    this->opponentSide = BLACK; 
+    
+>>>>>>> c3e46a501eccdb6f5bcb74844d508f20439ea216
     if(side == BLACK)
     {
         opponentSide = WHITE;
@@ -48,9 +53,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-     for(int i; i < 10; i++)
-     {
-		 //Change
-	 }
+     
+    //Process opponent's move
+    masterBoard->doMove(opponentsMove,opponentSide);
+    //Determine move 
     return NULL;
 }
