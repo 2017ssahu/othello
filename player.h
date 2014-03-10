@@ -19,6 +19,8 @@ public:
 
 private:
     Side mySide;
+    Side opponentSide;
+    Board* masterBoard;
 };
 
 #endif
