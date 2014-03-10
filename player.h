@@ -5,6 +5,10 @@
 #include "common.h"
 #include "board.h"
 #include <list>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8a772be42ce16236728f3acdeea04565a61c1a77
 using namespace std;
 
 class Player {
@@ -23,7 +27,11 @@ private:
     Side opponentSide;
     Board* masterBoard;
     Move* randomMove();
+<<<<<<< HEAD
     Move* simpleHeuristicMove();
+=======
+    std::list<Move*>* possibleMoves();
+>>>>>>> 8a772be42ce16236728f3acdeea04565a61c1a77
 };
 
 #endif

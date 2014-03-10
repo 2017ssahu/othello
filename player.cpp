@@ -1,5 +1,4 @@
 #include "player.h"
-
 /*
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish 
@@ -9,6 +8,8 @@ Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 	this->mySide = side;
+    this->opponentSide = BLACK;
+     
     this->opponentSide = BLACK; 
     
     if(side == BLACK)
@@ -49,6 +50,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */ 
     //Process opponent's move
+    masterBoard->doMove(opponentsMove, opponentSide);
     if (opponentsMove != NULL)
     {	
 		masterBoard->doMove(opponentsMove,opponentSide);
@@ -94,4 +96,25 @@ Move* Player::simpleHeuristicMove()
 	{
 		
 	}
+}
+	
+std::list<Move*>* Player::possibleMoves()
+{
+    std::list<Move*>* possibleMoves = new std::list<Move*>();
+    Move* iteratorMove = new Move(0, 0);
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            iteratorMove->setX(i);
+            iteratorMove->setY(j);
+            if (masterBoard->checkMove(iteratorMove, mySide))
+            {
+                Move* potentialMove = new Move(i, j);
+                possibleMoves->push_back(potentialMove);
+            }
+        }
+    }
+    delete iteratorMove;
+    return possibleMoves;
 }
