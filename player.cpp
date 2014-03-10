@@ -1,5 +1,4 @@
 #include "player.h"
-
 /*
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish 
@@ -9,13 +8,10 @@ Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
 	this->mySide = side;
-<<<<<<< HEAD
     this->opponentSide = BLACK;
      
-=======
     this->opponentSide = BLACK; 
     
->>>>>>> c3e46a501eccdb6f5bcb74844d508f20439ea216
     if(side == BLACK)
     {
         opponentSide = WHITE;
@@ -54,15 +50,12 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */ 
     //Process opponent's move
-<<<<<<< HEAD
     masterBoard->doMove(opponentsMove, opponentSide);
-=======
     if (opponentsMove != NULL)
     {	
 		masterBoard->doMove(opponentsMove,opponentSide);
 	}
 	
->>>>>>> 034edc24b3a42a16db8c0ebb713ea3236bc19e9c
     //Determine move 
     return randomMove();
 }
@@ -92,4 +85,24 @@ Move* Player::randomMove()
 	}	
 	
 	return NULL;
+}
+std::list<Move*>* Player::possibleMoves()
+{
+    std::list<Move*>* possibleMoves = new std::list<Move*>();
+    Move* iteratorMove = new Move(0, 0);
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            iteratorMove->setX(i);
+            iteratorMove->setY(j);
+            if (masterBoard->checkMove(iteratorMove, mySide))
+            {
+                Move* potentialMove = new Move(i, j);
+                possibleMoves->push_back(potentialMove);
+            }
+        }
+    }
+    delete iteratorMove;
+    return possibleMoves;
 }

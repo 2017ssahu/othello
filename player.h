@@ -4,6 +4,8 @@
 #include <iostream>
 #include "common.h"
 #include "board.h"
+#include <list>
+
 using namespace std;
 
 class Player {
@@ -22,6 +24,7 @@ private:
     Side opponentSide;
     Board* masterBoard;
     Move* randomMove();
+    std::list<Move*>* possibleMoves();
 };
 
 #endif
