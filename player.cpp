@@ -48,9 +48,39 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * TODO: Implement how moves your AI should play here. You should first
      * process the opponent's opponents move before calculating your own move
      */ 
-     
     //Process opponent's move
-    masterBoard->doMove(opponentsMove,opponentSide);
+    if (opponentsMove != NULL)
+    {	
+		masterBoard->doMove(opponentsMove,opponentSide);
+	}
+	
     //Determine move 
-    return NULL;
+    return randomMove();
+}
+
+/**
+ * Chooses a pseudo-random move by iterating through the board in order
+ * and selecting the first valid move.
+ * 
+ */
+Move* Player::randomMove()
+{
+	Move* randMove = new Move(0,0);
+	
+    for (int i = 0; i < 8; i++)
+    {
+		for (int j = 0; j < 8; j++)
+		{
+			randMove->setX(i);
+			randMove->setY(j);
+			
+			if (masterBoard->checkMove(randMove,mySide))
+			{
+				masterBoard->doMove(randMove,mySide);
+				return randMove;
+			}
+		}
+	}	
+	
+	return NULL;
 }
