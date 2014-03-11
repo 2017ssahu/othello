@@ -10,8 +10,6 @@ Player::Player(Side side) {
     temp = 0;
 	this->mySide = side;
     this->opponentSide = BLACK;
-     
-    this->opponentSide = BLACK; 
     
     if(side == BLACK)
     {
@@ -90,7 +88,7 @@ Move* Player::randomMove()
 
 Move* Player::simpleHeuristicMove()
 {
-	std::list<Move*>* moveList = possibleMoves();
+	std::list<Move*>* moveList = possibleMoves(masterBoard);
 	
 	if (moveList == NULL)
 	{
@@ -113,13 +111,13 @@ Move* Player::simpleHeuristicMove()
 	}
 	
 	delete moveList;
-	masterBoard->doMove(bestMove,mySide);
+	masterBoard->doMove(bestMove,mySide);	//Apply Move
 	return bestMove;
 }
 	
-std::list<Move*>* Player::possibleMoves()
+std::list<Move*>* Player::possibleMoves(Board* tempBoard)
 {
-	if (!masterBoard->hasMoves(mySide))
+	if (!tempBoard->hasMoves(mySide))
 	{
 		return NULL;
 	}
@@ -132,13 +130,14 @@ std::list<Move*>* Player::possibleMoves()
         {
             iteratorMove->setX(i);
             iteratorMove->setY(j);
-            if (masterBoard->checkMove(iteratorMove, mySide))
+            if (tempBoard->checkMove(iteratorMove, mySide))
             {
                 Move* potentialMove = new Move(i, j);
                 possibleMoves->push_back(potentialMove);
             }
         }
     }
+    
     delete iteratorMove;
     return possibleMoves;
 }
@@ -148,6 +147,16 @@ void Player::heuristic(Move* move, Side side)
 	Board* tempBoard = masterBoard->copy();	//Copies board and applies move
 	tempBoard->doMove(move,side);
 	
-	move->setScore(tempBoard->count(side));
+	move->setScore(tempBoard->count(side) - masterBoard->count(side));
 	delete tempBoard;
+}
+
+Move* Player::miniMaxMove(int depth)
+{
+	Board* tempBoard = masterBoard;
+	
+	for (int i = 0; i < depth; i++)
+	{
+		
+	}
 }
