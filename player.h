@@ -26,6 +26,7 @@ private:
     Move* randomMove();
     Move* simpleHeuristicMove();
     std::list<Move*>* possibleMoves();
+    void heuristic(Move* move,Side side);
 };
 
 #endif
