@@ -35,10 +35,11 @@ struct DecisionTreeNode
     std::list<DecisionTreeNode*>* children;
     Move* currentMove;
 
-    DecisionTreeNode(DecisionTreeNode* parentNode, Move* move)
+    DecisionTreeNode(DecisionTreeNode* parentNode, Move* move, std::list<DecisionTreeNode*>* childList)
     {
         parent = parentNode;
         currentMove = move;
+        children = childList;
     }
     DecisionTreeNode* getParent()
     {
