@@ -149,24 +149,38 @@ std::list<Move*>* Player::possibleMoves(Board* tempBoard,Side side)
     return possibleMoves;
 }
 
-
+/**
+ * Returns the score of a a given board position with the move applied to it
+ * Adds points for an increase in stones of the player side and for getting
+ * corners or sides. Adds penalty for the spots near the corner
+ * 
+ */ 
 int Player::heuristic(Move* move, Side side,Board* originalBoard)
 {
 	int score = 0;
 	Board* tempBoard = originalBoard->copy();	//Copies board and applies move
 	tempBoard->doMove(move,side);
 	
-	score += (tempBoard->count(side) - originalBoard->count(side));
-    if((move->getX() == 0 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 0) || (move->getX() == 7 && move->getY() == 7))
-        score += 10;
-    else if((move->getX() == 1 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 6) || (move->getX() == 6 && move->getY() == 1) || (move->getX() == 6 && move->getY() == 6))
-        score -= 10;
-    else if((move->getX() == 1 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 6) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 6))
-        score -= 5;
-    else if((move->getX() == 0) || (move->getX() == 7) || (move->getY() == 0) || (move->getY()) == 7)
-        score += 5;
+	if (!testingMinimax)
+	{
+		score += (tempBoard->count(side) - originalBoard->count(side));
+		if((move->getX() == 0 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 0) || (move->getX() == 7 && move->getY() == 7))
+			score += 10;
+		else if((move->getX() == 1 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 6) || (move->getX() == 6 && move->getY() == 1) || (move->getX() == 6 && move->getY() == 6))
+			score -= 10;
+		else if((move->getX() == 1 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 6) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 6))
+			score -= 5;
+		else if((move->getX() == 0) || (move->getX() == 7) || (move->getY() == 0) || (move->getY()) == 7)
+			score += 5;
+	}
+	else
+	{
+		score += tempBoard->count(mySide) - tempBoard->count(opponentSide);
+	}
 
 	delete tempBoard;
+	
+	
     if(side == mySide)
 	   return (score);
     else
@@ -211,7 +225,8 @@ DecisionTreeNode* Player::findMax (std::list<DecisionTreeNode*>* list)
 
 
 /**
- * Uses a miniMax tree to determine the best course of action
+ * Uses a miniMax tree to determine the best course of action. Hard coded to explore
+ * to a depth of two, but this will be changed in future iterations
  * 
  */ 
 Move* Player::miniMaxMove(int depth)
@@ -305,4 +320,13 @@ Move* Player::miniMaxMove(int depth)
 	Move* chosenMove = (findMax(childrenList))->getCurrentMove();
 	masterBoard->doMove(chosenMove,mySide);
 	return (chosenMove);
+}
+
+/**
+ * Sets masterBoard to the board passed as parameter. Used to test minimax
+ * 
+ */ 
+void Player::setBoard(Board* board)
+{
+	masterBoard = board;
 }
