@@ -86,6 +86,10 @@ Move* Player::randomMove()
 	return NULL;
 }
 
+/**
+ * Picks a move based on a simple heuristic
+ * 
+ */
 Move* Player::simpleHeuristicMove()
 {
 	std::list<Move*>* moveList = possibleMoves(masterBoard,mySide);
@@ -97,7 +101,7 @@ Move* Player::simpleHeuristicMove()
 	
 	for (std::list<Move*>::iterator i= moveList->begin(); i != moveList->end(); ++i)
 	{
-		heuristic(*i,mySide,masterBoard);	//assigns a heuristic score to each move
+		(*i)->setScore(heuristic(*i,mySide,masterBoard));	//assigns a heuristic score to each move
 	}
 	
 	Move* bestMove = *(moveList->begin()); //Set bestMove to the first move initially
@@ -115,6 +119,9 @@ Move* Player::simpleHeuristicMove()
 	return bestMove;
 }
 	
+/**
+ * Returns of list of all possile moves by the side given as parameter
+ */ 
 std::list<Move*>* Player::possibleMoves(Board* tempBoard,Side side)
 {
 	if (!tempBoard->hasMoves(side))
@@ -143,21 +150,23 @@ std::list<Move*>* Player::possibleMoves(Board* tempBoard,Side side)
 }
 
 //Change this or else
-void Player::heuristic(Move* move, Side side,Board* originalBoard)
+int Player::heuristic(Move* move, Side side,Board* originalBoard)
 {
+	int score = 0;
 	Board* tempBoard = originalBoard->copy();	//Copies board and applies move
 	tempBoard->doMove(move,side);
 	
 	if (side == mySide)
 	{
-		move->setScore(tempBoard->count(side) - originalBoard->count(side));
+		score += (tempBoard->count(side) - originalBoard->count(side));
 	}
 	else
 	{
-		move->setScore(-(tempBoard->count(side) - originalBoard->count(side)));
+		score += (-(tempBoard->count(side) - originalBoard->count(side)));
 	}
 	
 	delete tempBoard;
+	return score;
 }
 
 DecisionTreeNode* Player::findMin (std::list<DecisionTreeNode*>* list)
@@ -245,6 +254,8 @@ Move* Player::miniMaxMove(int depth)
 				if (*j != NULL)
 					fprintf(stderr, "\tWhite Moves: %d,%d\n",(*j)->getCurrentMove()->getX(),(*j)->getCurrentMove()->getY());
 			}
+			
+			fprintf(stderr, "Finished White Moves\n");
 		}
 	} 
 	
@@ -262,7 +273,7 @@ Move* Player::miniMaxMove(int depth)
 		//For every second level child
 		for (std::list<DecisionTreeNode*>::iterator j = secondChildren->begin(); j != secondChildren->end(); j++)
 		{
-				heuristic((*j)->getCurrentMove(),opponentSide,tempSecondBoard);
+				(*j)->getCurrentMove()->setScore(heuristic((*j)->getCurrentMove(),opponentSide,tempSecondBoard));
 		}
 		
 		(*i)->getCurrentMove()->setScore(findMin(secondChildren)->getCurrentMove()->getScore());
