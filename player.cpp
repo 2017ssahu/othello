@@ -9,7 +9,11 @@ Player::Player(Side side) {
     testingMinimax = false;
     temp = 0;
 	this->mySide = side;
+<<<<<<< HEAD
     this->opponentSide = BLACK;
+=======
+    this->opponentSide = BLACK; 
+>>>>>>> cc74be2bf89b01011f82dd4a3676013b80d45201
     
     if(side == BLACK)
     {
@@ -55,6 +59,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		masterBoard->doMove(opponentsMove,opponentSide);
 	}
 	
+    //Determine move
+
+    //return randomMove();
     //Determine move 
     return simpleHeuristicMove();
 }

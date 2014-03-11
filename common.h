@@ -1,5 +1,6 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
+#include <list>
 
 enum Side { 
     WHITE, BLACK
@@ -26,6 +27,35 @@ public:
 
 private:
     int score;
+};
+
+struct decisionTreeNode
+{
+    decisionTreeNode* parent;
+    std::list<decisionTreeNode*>* children;
+    Move* currentMove;
+
+    decisionTreeNode(decisionTreeNode* parentNode, Move* move)
+    {
+        parent = parentNode;
+        currentMove = move;
+    }
+    decisionTreeNode* getParent()
+    {
+        return parent;
+    }
+    std::list<decisionTreeNode*>* getChildren()
+    {
+        return children;
+    }
+    void addChildren(list<decisionTreeNode*>* childList)
+    {
+        children = childList;
+    }
+    Move* getCurrentMove()
+    {
+        return currentMove;
+    }
 };
 
 #endif
