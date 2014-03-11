@@ -2,6 +2,7 @@
 #define __PLAYER_H__
 
 #include <iostream>
+#include <cstdio>
 #include "common.h"
 #include "board.h"
 #include <list>
@@ -20,6 +21,7 @@ public:
     bool testingMinimax;
 
 private:
+    int temp;
     Side mySide;
     Side opponentSide;
     Board* masterBoard;
