@@ -208,5 +208,18 @@ Move* Player::miniMaxMove(int depth)
 	}
 	
 	//Set the heuristic
+	//Set bottom row of table first
+	tempBoard = masterBoard->copy();
 	
+	
+	for(std::list<DecisionTreeNode*>::iterator i = childrenList->begin(); i != childrenList->end(); i++)
+	{
+		//tempBoard->doMove((*i)
+		std::list<DecisionTreeNode*>* children = (*i)->getChildren();
+		
+		for (std::list<DecisionTreeNode*>::iterator j = children->begin(); j != children->end(); j++)
+		{
+				
+		}
+	}
 }
