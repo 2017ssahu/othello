@@ -149,7 +149,7 @@ std::list<Move*>* Player::possibleMoves(Board* tempBoard,Side side)
     return possibleMoves;
 }
 
-//Change this or else
+
 int Player::heuristic(Move* move, Side side,Board* originalBoard)
 {
 	int score = 0;
@@ -169,6 +169,11 @@ int Player::heuristic(Move* move, Side side,Board* originalBoard)
 	return score;
 }
 
+/**
+ * Finds the max heuristic score associated with a move contained within
+ * a DecisionTreeNode element in the list passed as a parameter
+ * 
+ */ 
 DecisionTreeNode* Player::findMin (std::list<DecisionTreeNode*>* list)
 {
     DecisionTreeNode* min = list->front();
@@ -182,6 +187,11 @@ DecisionTreeNode* Player::findMin (std::list<DecisionTreeNode*>* list)
     return min;
 }
 
+/**
+ * Finds the min heuristic score associated with a move contained within
+ * a DecisionTreeNode element in the list passed as a parameter
+ * 
+ */ 
 DecisionTreeNode* Player::findMax (std::list<DecisionTreeNode*>* list)
 {
     DecisionTreeNode* max = list->front();
@@ -195,13 +205,18 @@ DecisionTreeNode* Player::findMax (std::list<DecisionTreeNode*>* list)
     return max;
 }
 
+
+/**
+ * Uses a miniMax tree to determine the best course of action
+ * 
+ */ 
 Move* Player::miniMaxMove(int depth)
 {
 	Board* tempBoard = masterBoard->copy();
 	std::list<Move*>* masterMoveList = possibleMoves(tempBoard,mySide);
 	DecisionTreeNode* parentNode = NULL;
 	
-	if (masterMoveList == NULL)
+	if (masterMoveList == NULL)	//Return NULL if there are no moves to be made
 	{
 		return NULL;
 	}
