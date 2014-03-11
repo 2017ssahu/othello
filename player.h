@@ -6,7 +6,6 @@
 #include "common.h"
 #include "board.h"
 #include <list>
-
 using namespace std;
 
 class Player {
@@ -27,7 +26,7 @@ private:
     Board* masterBoard;
     Move* randomMove();
     Move* simpleHeuristicMove();
-    std::list<Move*>* possibleMoves(Board* tempBoard);
+    std::list<Move*>* possibleMoves(Board* tempBoard,Side side);
     void heuristic(Move* move,Side side);
     Move* miniMaxMove(int depth);
 };

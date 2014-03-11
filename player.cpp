@@ -56,9 +56,11 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	}
 	
     //Determine move
-
-    //return randomMove();
-    //Determine move 
+    if (temp < 1)
+    {
+		 miniMaxMove(1);
+		 temp++;
+	 }
     return simpleHeuristicMove();
 }
 
@@ -91,7 +93,7 @@ Move* Player::randomMove()
 
 Move* Player::simpleHeuristicMove()
 {
-	std::list<Move*>* moveList = possibleMoves(masterBoard);
+	std::list<Move*>* moveList = possibleMoves(masterBoard,mySide);
 	
 	if (moveList == NULL)
 	{
@@ -118,9 +120,9 @@ Move* Player::simpleHeuristicMove()
 	return bestMove;
 }
 	
-std::list<Move*>* Player::possibleMoves(Board* tempBoard)
+std::list<Move*>* Player::possibleMoves(Board* tempBoard,Side side)
 {
-	if (!tempBoard->hasMoves(mySide))
+	if (!tempBoard->hasMoves(side))
 	{
 		return NULL;
 	}
@@ -133,7 +135,7 @@ std::list<Move*>* Player::possibleMoves(Board* tempBoard)
         {
             iteratorMove->setX(i);
             iteratorMove->setY(j);
-            if (tempBoard->checkMove(iteratorMove, mySide))
+            if (tempBoard->checkMove(iteratorMove, side))
             {
                 Move* potentialMove = new Move(i, j);
                 possibleMoves->push_back(potentialMove);
@@ -157,16 +159,45 @@ void Player::heuristic(Move* move, Side side)
 Move* Player::miniMaxMove(int depth)
 {
 	Board* tempBoard = masterBoard->copy();
+	std::list<Move*>* masterMoveList = possibleMoves(tempBoard,mySide);
 	DecisionTreeNode* parentNode = NULL;
 	
-	for (int i = 0; i < depth; i++)
-	{
-		std::list<Move*>* moveList = possibleMoves(tempBoard);
-	
+	std::list<DecisionTreeNode*>* childrenList = new std::list<DecisionTreeNode*>();
 		
-		for (std::list<Move*>::iterator i = moveList->begin(); i != moveList->end(); i++)
+	for (std::list<Move*>::iterator i = masterMoveList->begin(); i != masterMoveList->end(); i++)
+	{
+		childrenList->push_back(new DecisionTreeNode(parentNode,*i));
+	}
+		
+	for (std::list<DecisionTreeNode*>::iterator i = childrenList->begin(); i != childrenList->end(); i++)
+	{
+		parentNode = (*i);
+		Move* cMove = parentNode->getCurrentMove();
+		Board* secondLevel = tempBoard->copy();
+		secondLevel->doMove(cMove,mySide);
+		
+		std::list<Move*>* secondMoveList = possibleMoves(secondLevel,opponentSide);
+		std::list<DecisionTreeNode*>* secondChildrenList = new std::list<DecisionTreeNode*>();
+		
+		for (std::list<Move*>::iterator i = secondMoveList->begin(); i != secondMoveList->end(); i++)
 		{
-			
+			secondChildrenList->push_back(new DecisionTreeNode(parentNode,*i));
+		}
+		
+		parentNode->addChildren(secondChildrenList);
+	}
+	
+	//Check values
+	for(std::list<DecisionTreeNode*>::iterator i = childrenList->begin(); i != childrenList->end(); i++)
+	{
+		fprintf(stderr, "Top Value Moves: %d,%d\n",(*i)->getCurrentMove()->getX(),(*i)->getCurrentMove()->getY());
+		std::list<DecisionTreeNode*>* children = (*i)->getChildren();
+		
+		for (std::list<DecisionTreeNode*>::iterator j = children->begin(); j != children->end(); j++)
+		{
+				fprintf(stderr, "\tNext Moves: %d,%d\n",(*j)->getCurrentMove()->getX(),(*j)->getCurrentMove()->getY());
 		}
 	}
+	
+	//Set the heuristic
 }
