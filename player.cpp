@@ -9,11 +9,7 @@ Player::Player(Side side) {
     testingMinimax = false;
     temp = 0;
 	this->mySide = side;
-<<<<<<< HEAD
     this->opponentSide = BLACK;
-=======
-    this->opponentSide = BLACK; 
->>>>>>> cc74be2bf89b01011f82dd4a3676013b80d45201
     
     if(side == BLACK)
     {
@@ -161,9 +157,15 @@ void Player::heuristic(Move* move, Side side)
 Move* Player::miniMaxMove(int depth)
 {
 	Board* tempBoard = masterBoard;
+	DecisionTreeNode* currentMove = NULL;
 	
 	for (int i = 0; i < depth; i++)
 	{
+		std::list<Move*>* moveList = possibleMoves(tempBoard);
 		
+		for (std::list<Move*>::iterator i = moveList->begin(); i != moveList->end(); i++)
+		{
+			
+		}
 	}
 }
