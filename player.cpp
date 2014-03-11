@@ -156,8 +156,8 @@ void Player::heuristic(Move* move, Side side)
 
 Move* Player::miniMaxMove(int depth)
 {
-	Board* tempBoard = masterBoard;
-	DecisionTreeNode* currentMove = NULL;
+	Board* tempBoard = masterBoard->copy();
+	DecisionTreeNode* parentNode = NULL;
 	
 	for (int i = 0; i < depth; i++)
 	{

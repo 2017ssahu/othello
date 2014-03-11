@@ -48,11 +48,7 @@ struct DecisionTreeNode
     {
         return children;
     }
-<<<<<<< HEAD
-    void addChildren(std::list<decisionTreeNode*>* childList)
-=======
     void addChildren(std::list<DecisionTreeNode*>* childList)
->>>>>>> 2115c4773629c7f79b48f5b447fd121fbf4cfe46
     {
         children = childList;
     }
