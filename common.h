@@ -29,26 +29,30 @@ private:
     int score;
 };
 
-struct decisionTreeNode
+struct DecisionTreeNode
 {
-    decisionTreeNode* parent;
-    std::list<decisionTreeNode*>* children;
+    DecisionTreeNode* parent;
+    std::list<DecisionTreeNode*>* children;
     Move* currentMove;
 
-    decisionTreeNode(decisionTreeNode* parentNode, Move* move)
+    DecisionTreeNode(DecisionTreeNode* parentNode, Move* move)
     {
         parent = parentNode;
         currentMove = move;
     }
-    decisionTreeNode* getParent()
+    DecisionTreeNode* getParent()
     {
         return parent;
     }
-    std::list<decisionTreeNode*>* getChildren()
+    std::list<DecisionTreeNode*>* getChildren()
     {
         return children;
     }
+<<<<<<< HEAD
     void addChildren(std::list<decisionTreeNode*>* childList)
+=======
+    void addChildren(std::list<DecisionTreeNode*>* childList)
+>>>>>>> 2115c4773629c7f79b48f5b447fd121fbf4cfe46
     {
         children = childList;
     }
