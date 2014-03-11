@@ -268,13 +268,16 @@ Move* Player::miniMaxMove(int depth)
 		std::list<DecisionTreeNode*>* secondChildren = (*i)->getChildren();
 		Board* tempSecondBoard = tempBoard->copy();
 		
-		//For every second level child
-		for (std::list<DecisionTreeNode*>::iterator j = secondChildren->begin(); j != secondChildren->end(); j++)
+		if (secondChildren != NULL)
 		{
-				(*j)->getCurrentMove()->setScore(heuristic((*j)->getCurrentMove(),opponentSide,tempSecondBoard));
+			//For every second level child
+			for (std::list<DecisionTreeNode*>::iterator j = secondChildren->begin(); j != secondChildren->end(); j++)
+			{
+					(*j)->getCurrentMove()->setScore(heuristic((*j)->getCurrentMove(),opponentSide,tempSecondBoard));
+			}
+			
+			(*i)->getCurrentMove()->setScore(findMin(secondChildren)->getCurrentMove()->getScore());
 		}
-		
-		(*i)->getCurrentMove()->setScore(findMin(secondChildren)->getCurrentMove()->getScore());
 		tempBoard = masterBoard->copy();
 	}
 	
