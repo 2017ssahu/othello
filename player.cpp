@@ -147,6 +147,7 @@ std::list<Move*>* Player::possibleMoves(Board* tempBoard,Side side)
     return possibleMoves;
 }
 
+//Change this or else
 void Player::heuristic(Move* move, Side side,Board* originalBoard)
 {
 	Board* tempBoard = originalBoard->copy();	//Copies board and applies move
@@ -196,8 +197,13 @@ Move* Player::miniMaxMove(int depth)
 	std::list<Move*>* masterMoveList = possibleMoves(tempBoard,mySide);
 	DecisionTreeNode* parentNode = NULL;
 	
+	if (masterMoveList == NULL)
+	{
+		return NULL;
+	}
+	
 	std::list<DecisionTreeNode*>* childrenList = new std::list<DecisionTreeNode*>();
-		
+	//converts from moveList to treeNode	
 	for (std::list<Move*>::iterator i = masterMoveList->begin(); i != masterMoveList->end(); i++)
 	{
 		childrenList->push_back(new DecisionTreeNode(parentNode,*i));
@@ -211,14 +217,22 @@ Move* Player::miniMaxMove(int depth)
 		secondLevel->doMove(cMove,mySide);
 		
 		std::list<Move*>* secondMoveList = possibleMoves(secondLevel,opponentSide);
-		std::list<DecisionTreeNode*>* secondChildrenList = new std::list<DecisionTreeNode*>();
 		
-		for (std::list<Move*>::iterator i = secondMoveList->begin(); i != secondMoveList->end(); i++)
+		if (secondMoveList != NULL)
 		{
-			secondChildrenList->push_back(new DecisionTreeNode(parentNode,*i));
+			std::list<DecisionTreeNode*>* secondChildrenList = new std::list<DecisionTreeNode*>();
+			
+			for (std::list<Move*>::iterator i = secondMoveList->begin(); i != secondMoveList->end(); i++)
+			{
+				secondChildrenList->push_back(new DecisionTreeNode(parentNode,*i));
+			}
+			
+			parentNode->addChildren(secondChildrenList);
 		}
-		
-		parentNode->addChildren(secondChildrenList);
+		else
+		{
+			cMove->setScore(0);
+		}
 	}
 	
 	//Check values
@@ -250,11 +264,9 @@ Move* Player::miniMaxMove(int depth)
 				heuristic((*j)->getCurrentMove(),opponentSide,tempSecondBoard);
 		}
 		
-		int score = findMin(secondChildren);
-		(*i)->getCurrentMove()->setScore(score);
+		(*i)->getCurrentMove()->setScore(findMin(secondChildren)->getCurrentMove()->getScore());
 		tempBoard = masterBoard->copy();
 	}
 	
-	int max = findMax(childrenList);
-	
+	return (findMax(childrenList))->getCurrentMove();
 }
