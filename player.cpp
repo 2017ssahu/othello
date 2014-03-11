@@ -182,7 +182,7 @@ DecisionTreeNode* Player::findMax (std::list<DecisionTreeNode*>* list)
     DecisionTreeNode* max = list->front();
     for(std::list<DecisionTreeNode*>::iterator i = list->begin(); i != list->end(); i++)
     {
-        if((*i)->getCurrentMove()->getScore() < max->getCurrentMove()->getScore())
+        if((*i)->getCurrentMove()->getScore() > max->getCurrentMove()->getScore())
         {
             max = *i;
         }
@@ -237,15 +237,24 @@ Move* Player::miniMaxMove(int depth)
 	//Set bottom row of table first
 	tempBoard = masterBoard->copy();
 	
-	
+	//For every first level child
 	for(std::list<DecisionTreeNode*>::iterator i = childrenList->begin(); i != childrenList->end(); i++)
 	{
-		//tempBoard->doMove((*i)
-		std::list<DecisionTreeNode*>* children = (*i)->getChildren();
+		tempBoard->doMove((*i)->getCurrentMove(),mySide);
+		std::list<DecisionTreeNode*>* secondChildren = (*i)->getChildren();
+		Board* tempSecondBoard = tempBoard->copy();
 		
-		for (std::list<DecisionTreeNode*>::iterator j = children->begin(); j != children->end(); j++)
+		//For every second level child
+		for (std::list<DecisionTreeNode*>::iterator j = secondChildren->begin(); j != secondChildren->end(); j++)
 		{
-				
+				heuristic((*j)->getCurrentMove(),opponentSide,tempSecondBoard);
 		}
+		
+		int score = findMin(secondChildren);
+		(*i)->getCurrentMove()->setScore(score);
+		tempBoard = masterBoard->copy();
 	}
+	
+	int max = findMax(childrenList);
+	
 }
