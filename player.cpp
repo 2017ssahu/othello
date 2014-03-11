@@ -165,7 +165,7 @@ void Player::heuristic(Move* move, Side side,Board* originalBoard)
 	delete tempBoard;
 }
 
-int Player::findMin (std::list<DecisionTreeNode*>* list)
+DecisionTreeNode* Player::findMin (std::list<DecisionTreeNode*>* list)
 {
     DecisionTreeNode* min = list->front();
     for(std::list<DecisionTreeNode*>::iterator i = list->begin(); i != list->end(); i++)
@@ -175,10 +175,10 @@ int Player::findMin (std::list<DecisionTreeNode*>* list)
             min = *i;
         }
     }
-    return min->getCurrentMove()->getScore();
+    return min;
 }
 
-int Player::findMax (std::list<DecisionTreeNode*>* list)
+DecisionTreeNode* Player::findMax (std::list<DecisionTreeNode*>* list)
 {
     DecisionTreeNode* max = list->front();
     for(std::list<DecisionTreeNode*>::iterator i = list->begin(); i != list->end(); i++)
@@ -188,7 +188,7 @@ int Player::findMax (std::list<DecisionTreeNode*>* list)
             max = *i;
         }
     }
-    return max->getCurrentMove()->getScore();
+    return max;
 }
 
 Move* Player::miniMaxMove(int depth)
