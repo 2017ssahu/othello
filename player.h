@@ -29,6 +29,8 @@ private:
     std::list<Move*>* possibleMoves(Board* tempBoard,Side side);
     void heuristic(Move* move,Side side,Board* originalBoard);
     Move* miniMaxMove(int depth);
+    DecisionTreeNode* findMin(std::list<DecisionTreeNode*>* list);
+    DecisionTreeNode* findMax(std::list<DecisionTreeNode*>* list);
 };
 
 #endif
