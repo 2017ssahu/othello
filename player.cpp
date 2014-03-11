@@ -162,6 +162,7 @@ Move* Player::miniMaxMove(int depth)
 	for (int i = 0; i < depth; i++)
 	{
 		std::list<Move*>* moveList = possibleMoves(tempBoard);
+	
 		
 		for (std::list<Move*>::iterator i = moveList->begin(); i != moveList->end(); i++)
 		{
