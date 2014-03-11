@@ -9,8 +9,6 @@ Player::Player(Side side) {
     testingMinimax = false;
     temp = 0;
 	this->mySide = side;
-    this->opponentSide = BLACK;
-     
     this->opponentSide = BLACK; 
     
     if(side == BLACK)
@@ -100,17 +98,6 @@ Move* Player::simpleHeuristicMove()
 		return NULL;
 	}
 	
-	if (temp <= 1)
-	{
-		for (std::list<Move*>::iterator i= moveList->begin(); i != moveList->end(); ++i)
-		{
-			fprintf(stderr, "Move: %d,%d\n", (*i)->getX(),(*i)->getY());
-		}
-		
-		fprintf(stderr, "%d\n", "123");
-		temp++;
-	}
-	
 	for (std::list<Move*>::iterator i= moveList->begin(); i != moveList->end(); ++i)
 	{
 		heuristic(*i,mySide);	//assigns a heuristic score to each move
@@ -127,6 +114,7 @@ Move* Player::simpleHeuristicMove()
 	}
 	
 	delete moveList;
+	masterBoard->doMove(bestMove,mySide);
 	return bestMove;
 }
 	
@@ -161,6 +149,6 @@ void Player::heuristic(Move* move, Side side)
 	Board* tempBoard = masterBoard->copy();	//Copies board and applies move
 	tempBoard->doMove(move,side);
 	
-	move->setScore(tempBoard->count(side));
+	move->setScore(tempBoard->count(side) - masterBoard->count(side));
 	delete tempBoard;
 }
