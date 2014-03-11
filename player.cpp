@@ -56,7 +56,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	}
 	
     //Determine move
-    if (temp < 1)
+    if (temp < 2)
     {
 		 miniMaxMove(1);
 		 temp++;
@@ -102,7 +102,7 @@ Move* Player::simpleHeuristicMove()
 	
 	for (std::list<Move*>::iterator i= moveList->begin(); i != moveList->end(); ++i)
 	{
-		heuristic(*i,mySide);	//assigns a heuristic score to each move
+		heuristic(*i,mySide,masterBoard);	//assigns a heuristic score to each move
 	}
 	
 	Move* bestMove = *(moveList->begin()); //Set bestMove to the first move initially
@@ -147,12 +147,20 @@ std::list<Move*>* Player::possibleMoves(Board* tempBoard,Side side)
     return possibleMoves;
 }
 
-void Player::heuristic(Move* move, Side side)
+void Player::heuristic(Move* move, Side side,Board* originalBoard)
 {
-	Board* tempBoard = masterBoard->copy();	//Copies board and applies move
+	Board* tempBoard = originalBoard->copy();	//Copies board and applies move
 	tempBoard->doMove(move,side);
 	
-	move->setScore(tempBoard->count(side) - masterBoard->count(side));
+	if (side == mySide)
+	{
+		move->setScore(tempBoard->count(side) - originalBoard->count(side));
+	}
+	else
+	{
+		move->setScore(-(tempBoard->count(side) - originalBoard->count(side)));
+	}
+	
 	delete tempBoard;
 }
 
@@ -200,4 +208,5 @@ Move* Player::miniMaxMove(int depth)
 	}
 	
 	//Set the heuristic
+	
 }

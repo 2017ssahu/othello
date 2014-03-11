@@ -27,7 +27,7 @@ private:
     Move* randomMove();
     Move* simpleHeuristicMove();
     std::list<Move*>* possibleMoves(Board* tempBoard,Side side);
-    void heuristic(Move* move,Side side);
+    void heuristic(Move* move,Side side,Board* originalBoard);
     Move* miniMaxMove(int depth);
 };
 
