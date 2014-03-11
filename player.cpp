@@ -7,6 +7,7 @@
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
+    temp = 0;
 	this->mySide = side;
     this->opponentSide = BLACK;
      
@@ -50,7 +51,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */ 
     //Process opponent's move
-    masterBoard->doMove(opponentsMove, opponentSide);
+    
     if (opponentsMove != NULL)
     {	
 		masterBoard->doMove(opponentsMove,opponentSide);
@@ -94,6 +95,17 @@ Move* Player::simpleHeuristicMove()
 	if (moveList == NULL)
 	{
 		return NULL;
+	}
+	
+	if (temp <= 1)
+	{
+		for (std::list<Move*>::iterator i= moveList->begin(); i != moveList->end(); ++i)
+		{
+			fprintf(stderr, "Move: %d,%d\n", (*i)->getX(),(*i)->getY());
+		}
+		
+		fprintf(stderr, "%d\n", "123");
+		temp++;
 	}
 	
 	for (std::list<Move*>::iterator i= moveList->begin(); i != moveList->end(); ++i)
