@@ -233,12 +233,12 @@ Move* Player::miniMaxMove(int depth)
 	//Check values
 	for(std::list<DecisionTreeNode*>::iterator i = childrenList->begin(); i != childrenList->end(); i++)
 	{
-		fprintf(stderr, "Top Value Moves: %d,%d\n",(*i)->getCurrentMove()->getX(),(*i)->getCurrentMove()->getY());
+		fprintf(stderr, "BLACK Moves: %d,%d\n",(*i)->getCurrentMove()->getX(),(*i)->getCurrentMove()->getY());
 		std::list<DecisionTreeNode*>* children = (*i)->getChildren();
 		
 		for (std::list<DecisionTreeNode*>::iterator j = children->begin(); j != children->end(); j++)
 		{
-				fprintf(stderr, "\tNext Moves: %d,%d\n",(*j)->getCurrentMove()->getX(),(*j)->getCurrentMove()->getY());
+				fprintf(stderr, "\tWHITE Moves: %d,%d\n",(*j)->getCurrentMove()->getX(),(*j)->getCurrentMove()->getY());
 		}
 	}
 	
