@@ -56,7 +56,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		masterBoard->doMove(opponentsMove,opponentSide);
 	}
 	
-    //Determine move 
+    //Determine move
+
     return randomMove();
 }
 
