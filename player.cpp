@@ -156,17 +156,21 @@ int Player::heuristic(Move* move, Side side,Board* originalBoard)
 	Board* tempBoard = originalBoard->copy();	//Copies board and applies move
 	tempBoard->doMove(move,side);
 	
-	if (side == mySide)
-	{
-		score += (tempBoard->count(side) - originalBoard->count(side));
-	}
-	else
-	{
-		score += (-(tempBoard->count(side) - originalBoard->count(side)));
-	}
-	
+	score += (tempBoard->count(side) - originalBoard->count(side));
+    if((move->getX() == 0 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 0) || (move->getX() == 7 && move->getY() == 7))
+        score += 10;
+    else if((move->getX() == 1 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 6) || (move->getX() == 6 && move->getY() == 1) || (move->getX() == 6 && move->getY() == 6))
+        score -= 10;
+    else if((move->getX() == 1 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 6) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 6))
+        score -= 5;
+    else if((move->getX() == 0) || (move->getX() == 7) || (move->getY() == 0) || (move->getY()) == 7)
+        score += 5;
+
 	delete tempBoard;
-	return score;
+    if(side == mySide)
+	   return (score);
+    else
+        return (-score); 
 }
 
 DecisionTreeNode* Player::findMin (std::list<DecisionTreeNode*>* list)
@@ -240,7 +244,7 @@ Move* Player::miniMaxMove(int depth)
 	}
 	
 	//Check values
-	for(std::list<DecisionTreeNode*>::iterator i = childrenList->begin(); i != childrenList->end(); i++)
+	/*for(std::list<DecisionTreeNode*>::iterator i = childrenList->begin(); i != childrenList->end(); i++)
 	{
 
 		fprintf(stderr, "Black Moves: %d,%d\n",(*i)->getCurrentMove()->getX(),(*i)->getCurrentMove()->getY());
@@ -257,7 +261,7 @@ Move* Player::miniMaxMove(int depth)
 			
 			fprintf(stderr, "Finished White Moves\n");
 		}
-	} 
+	}*/ 
 	
 	//Set the heuristic
 	//Set bottom row of table first
