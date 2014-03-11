@@ -94,6 +94,11 @@ Move* Player::simpleHeuristicMove()
 {
 	std::list<Move*>* moveList = possibleMoves();
 	
+	if (moveList == NULL)
+	{
+		return NULL;
+	}
+	
 	for (std::list<Move*>::iterator i= moveList->begin(); i != moveList->end(); ++i)
 	{
 		heuristic(*i,mySide);	//assigns a heuristic score to each move
@@ -109,13 +114,19 @@ Move* Player::simpleHeuristicMove()
 		}
 	}
 	
+	delete moveList;
 	return bestMove;
 }
 	
 std::list<Move*>* Player::possibleMoves()
 {
+	if (!masterBoard->hasMoves(mySide))
+	{
+		return NULL;
+	}
+	
     std::list<Move*>* possibleMoves = new std::list<Move*>();
-    Move* iteratorMove = new Move(0, 0);
+    Move* iteratorMove = new Move(0,0);
     for (int i = 0; i < 8; i++)
     {
         for (int j = 0; j < 8; j++)
