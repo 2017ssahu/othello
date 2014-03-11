@@ -41,6 +41,11 @@ struct DecisionTreeNode
         currentMove = move;
         children = childList;
     }
+    DecisionTreeNode(DecisionTreeNode* parentNode, Move* move)
+    {
+        parent = parentNode;
+        currentMove = move;
+    }
     DecisionTreeNode* getParent()
     {
         return parent;
