@@ -55,13 +55,8 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		masterBoard->doMove(opponentsMove,opponentSide);
 	}
 	
-    //Determine move
-    if (temp < 2)
-    {
-		 miniMaxMove(1);
-		 temp++;
-	 }
-    return simpleHeuristicMove();
+    //Determine move 
+    return miniMaxMove(2);
 }
 
 /**
@@ -268,5 +263,7 @@ Move* Player::miniMaxMove(int depth)
 		tempBoard = masterBoard->copy();
 	}
 	
-	return (findMax(childrenList))->getCurrentMove();
+	Move* chosenMove = (findMax(childrenList))->getCurrentMove();
+	masterBoard->doMove(chosenMove,mySide);
+	return (chosenMove);
 }
