@@ -153,12 +153,12 @@ std::list<Move*>* Player::possibleMoves(Board* tempBoard,Side side)
  * Returns the number of possible moves given a board and a side.
  */
 
-int Player::numMoves(Board* tempBoard,Side side)
+int Player::mobilityFactor(Board* tempBoard,Side side)
 {
-    int numPossibleMoves = 0;
+    int mobilityFactor = 0;
     if (!tempBoard->hasMoves(side))
     {
-        return  numPossibleMoves;
+        return  mobilityFactor;
     }
     
     Move* iteratorMove = new Move(0,0);
@@ -170,13 +170,17 @@ int Player::numMoves(Board* tempBoard,Side side)
             iteratorMove->setY(j);
             if (tempBoard->checkMove(iteratorMove, side))
             {
-                numPossibleMoves++;
+                mobilityFactor++;
+            }
+            if (tempBoard->checkMove(iteratorMove, opponentSide))
+            {
+                mobilityFactor--;
             }
         }
     }
     
     delete iteratorMove;
-    return numPossibleMoves;
+    return mobilityFactor;
 } 
 
 /**
@@ -204,7 +208,7 @@ int Player::heuristic(Move* move, Side side,Board* originalBoard)
 			score += 5;
 
         //Adding in consideration to number of moves available
-        score -= numMoves(tempBoard, opponentSide);
+        score += mobilityFactor(tempBoard, side);
 
 	}
 	else
