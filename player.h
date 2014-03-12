@@ -28,6 +28,7 @@ private:
     Move* randomMove();
     Move* simpleHeuristicMove();
     std::list<Move*>* possibleMoves(Board* tempBoard,Side side);
+    int numMoves(Board* tempBoard, Side side);
     int heuristic(Move* move,Side side,Board* originalBoard);
     Move* miniMaxMove(int depth);
     DecisionTreeNode* findMax (std::list<DecisionTreeNode*>* list);

@@ -150,6 +150,36 @@ std::list<Move*>* Player::possibleMoves(Board* tempBoard,Side side)
 }
 
 /**
+ * Returns the number of possible moves given a board and a side.
+ */
+
+int Player::numMoves(Board* tempBoard,Side side)
+{
+    int numPossibleMoves = 0;
+    if (!tempBoard->hasMoves(side))
+    {
+        return  numPossibleMoves;
+    }
+    
+    Move* iteratorMove = new Move(0,0);
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            iteratorMove->setX(i);
+            iteratorMove->setY(j);
+            if (tempBoard->checkMove(iteratorMove, side))
+            {
+                numPossibleMoves++;
+            }
+        }
+    }
+    
+    delete iteratorMove;
+    return numPossibleMoves;
+} 
+
+/**
  * Returns the score of a a given board position with the move applied to it
  * Adds points for an increase in stones of the player side and for getting
  * corners or sides. Adds penalty for the spots near the corner
@@ -172,6 +202,10 @@ int Player::heuristic(Move* move, Side side,Board* originalBoard)
 			score -= 5;
 		else if((move->getX() == 0) || (move->getX() == 7) || (move->getY() == 0) || (move->getY()) == 7)
 			score += 5;
+
+        //Adding in consideration to number of moves available
+        score -= numMoves(tempBoard, opponentSide);
+
 	}
 	else
 	{
