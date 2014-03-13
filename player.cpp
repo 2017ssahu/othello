@@ -209,7 +209,7 @@ int Player::heuristic(Move* move, Side side,Board* originalBoard)
         else if((move->getX() == 1) || (move->getX() == 6) || (move->getY() == 1) || (move->getY()) == 6)
             score -= 3;
         //Adding in consideration to number of moves available
-        score += mobilityFactor(tempBoard, side);
+        score += 5 * mobilityFactor(tempBoard, side);
 
 	}
 	else
