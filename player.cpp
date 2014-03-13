@@ -172,7 +172,7 @@ int Player::mobilityFactor(Board* tempBoard,Side side)
             {
                 mobilityFactor++;
             }
-            if (tempBoard->checkMove(iteratorMove, opponentSide))
+            if (tempBoard->checkMove(iteratorMove, flip(side)))
             {
                 mobilityFactor--;
             }
@@ -199,17 +199,18 @@ int Player::heuristic(Move* move, Side side,Board* originalBoard)
 	{
 		score += (tempBoard->count(side) - originalBoard->count(side));
 		if((move->getX() == 0 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 0) || (move->getX() == 7 && move->getY() == 7))
-			score += 10;
+			score += 50;
 		else if((move->getX() == 1 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 6) || (move->getX() == 6 && move->getY() == 1) || (move->getX() == 6 && move->getY() == 6))
-			score -= 10;
+			score -= 50;
 		else if((move->getX() == 1 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 6) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 6))
-			score -= 5;
+			score -= 25;
 		else if((move->getX() == 0) || (move->getX() == 7) || (move->getY() == 0) || (move->getY()) == 7)
-			score += 5;
+			score += 25;
         else if((move->getX() == 1) || (move->getX() == 6) || (move->getY() == 1) || (move->getY()) == 6)
-            score -= 3;
+            score -= 20;
         //Adding in consideration to number of moves available
-        score += 5 * mobilityFactor(tempBoard, side);
+        //fprintf(stderr, "Mobility Factor: %d\n", mobilityFactor(tempBoard, side));
+        score += 3 * mobilityFactor(tempBoard, side);
 
 	}
 	else
@@ -223,7 +224,7 @@ int Player::heuristic(Move* move, Side side,Board* originalBoard)
     if(side == mySide)
 	   return (score);
     else
-        return (-score); 
+        return (-1 * score); 
 }
 
 /**
