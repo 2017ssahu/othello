@@ -30,7 +30,9 @@ private:
     std::list<Move*>* possibleMoves(Board* tempBoard,Side side);
     int mobilityFactor(Board* tempBoard, Side side);
     int heuristic(Move* move,Side side,Board* originalBoard);
-    Move* miniMaxMove(int depth);
+    Move* miniMaxMove();
+    Move* miniMaxMove(int depth, Board* previousBoard,Move* move, Side side, DecisionTreeNode* parentNode);
+    Side flip(Side side);
     DecisionTreeNode* findMax (std::list<DecisionTreeNode*>* list);
     DecisionTreeNode* findMin (std::list<DecisionTreeNode*>* list);
 };

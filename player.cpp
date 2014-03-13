@@ -56,7 +56,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 	}
 	
     //Determine move 
-    return miniMaxMove(2);
+    return miniMaxMove();
 }
 
 /**
@@ -262,13 +262,50 @@ DecisionTreeNode* Player::findMax (std::list<DecisionTreeNode*>* list)
     return max;
 }
 
+Move* Player::miniMaxMove(int depth, Board* previousBoard,Move* move, Side side, DecisionTreeNode* parentNode)
+{
+	if (depth == 0)
+	{
+		new DecisionTreeNode(parentNode,move);
+		move->setScore(heuristic(move,side,previousBoard));
+	}
+	else
+	{
+		previousBoard->doMove(move,side);
+		std::list<Move*>* moveList = possibleMoves(previousBoard,side);
+		
+		if (moveList == NULL) //No possible moves in this board
+		{
+			return NULL;	//Make sure that this is what we want to do..
+		}
+		
+		std::list<DecisionTreeNode*>* childrenList = new std::list<DecisionTreeNode*>();
+		
+		for (std::list<Move*>::iterator i = moveList->begin(); i != moveList->end(); i++)
+		{
+			DecisionTreeNode* node = new DecisionTreeNode(parentNode,*i); //May not be necessary
+			childrenList->push_back(node); 
+			Board* currentBoardCopy = previousBoard->copy();
+			miniMaxMove(depth-1,currentBoardCopy,(*i),flip(side),node);
+		}
+		
+		if (side == mySide)
+		{
+			
+		}
+		else
+		{
+			
+		}
+	}
+}
 
 /**
  * Uses a miniMax tree to determine the best course of action. Hard coded to explore
  * to a depth of two, but this will be changed in future iterations
  * 
  */ 
-Move* Player::miniMaxMove(int depth)
+Move* Player::miniMaxMove()
 {
 	Board* tempBoard = masterBoard->copy();
 	std::list<Move*>* masterMoveList = possibleMoves(tempBoard,mySide);
@@ -359,6 +396,18 @@ Move* Player::miniMaxMove(int depth)
 	Move* chosenMove = (findMax(childrenList))->getCurrentMove();
 	masterBoard->doMove(chosenMove,mySide);
 	return (chosenMove);
+}
+
+Side Player::flip(Side side)
+{
+	if (side == BLACK)
+	{
+		return WHITE;
+	}
+	else
+	{
+		return BLACK;
+	}
 }
 
 /**
