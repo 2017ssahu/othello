@@ -83,7 +83,7 @@ Move* Player::miniMaxMove(int depth)
 	
 	Move* chosenMove = (findMax(childrenList))->getCurrentMove();
 	masterBoard->doMove(chosenMove,mySide);
-	printTree(childrenList);
+	//printTree(childrenList);
 	return (chosenMove);
 }
 
@@ -105,11 +105,11 @@ void Player::miniMaxMove(int depth,Board* board, Side side, DecisionTreeNode* no
 		{
 			if (side == mySide)
 			{
-				move->setScore(-100);
+				move->setScore(-1000);
 			}
 			else
 			{
-				move->setScore(100);
+				move->setScore(1000);
 			}
 		}
 		else
@@ -236,7 +236,7 @@ Move* Player::miniMaxMove()
 	
 	Move* chosenMove = (findMax(childrenList))->getCurrentMove();
 	masterBoard->doMove(chosenMove,mySide);
-	printTree(childrenList);
+	//printTree(childrenList);
 	return (chosenMove);
 }
 
@@ -320,20 +320,38 @@ int Player::heuristic(Move* move, Side side, Board* originalBoard)
 	
 	if (!testingMinimax)
 	{
-		score += (tempBoard->count(side) - originalBoard->count(side));
-		if((move->getX() == 0 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 0) || (move->getX() == 7 && move->getY() == 7))
-			score += 100;
-		else if((move->getX() == 1 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 6) || (move->getX() == 6 && move->getY() == 1) || (move->getX() == 6 && move->getY() == 6))
-			score -= 50;
-		else if((move->getX() == 1 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 6) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 6))
-			score -= 25;
-		else if((move->getX() == 0) || (move->getX() == 7) || (move->getY() == 0) || (move->getY()) == 7)
-			score += 25;
-        else if((move->getX() == 1) || (move->getX() == 6) || (move->getY() == 1) || (move->getY()) == 6)
-            score -= 20;
+		score += tempBoard->count(mySide) - tempBoard->count(opponentSide);
+		//score += (tempBoard->count(side) - originalBoard->count(side));
+		
+		if (side == mySide)
+		{
+			if((move->getX() == 0 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 0) || (move->getX() == 7 && move->getY() == 7))
+				score += 100;
+			else if((move->getX() == 1 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 6) || (move->getX() == 6 && move->getY() == 1) || (move->getX() == 6 && move->getY() == 6))
+				score -= 100;
+			else if((move->getX() == 1 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 6) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 6))
+				score -= 75;
+			else if((move->getX() == 0) || (move->getX() == 7) || (move->getY() == 0) || (move->getY()) == 7)
+				score += 25;
+			else if((move->getX() == 1) || (move->getX() == 6) || (move->getY() == 1) || (move->getY()) == 6)
+				score -= 20;
+		}
+		else //Double check these things
+		{
+			if((move->getX() == 0 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 0) || (move->getX() == 7 && move->getY() == 7))
+				score -= 100;
+			else if((move->getX() == 1 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 6) || (move->getX() == 6 && move->getY() == 1) || (move->getX() == 6 && move->getY() == 6))
+				score += 100;
+			else if((move->getX() == 1 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 1) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 0) || (move->getX() == 0 && move->getY() == 6) || (move->getX() == 1 && move->getY() == 7) || (move->getX() == 6 && move->getY() == 7) || (move->getX() == 7 && move->getY() == 6))
+				score += 75;
+			else if((move->getX() == 0) || (move->getX() == 7) || (move->getY() == 0) || (move->getY()) == 7)
+				score -= 25;
+			else if((move->getX() == 1) || (move->getX() == 6) || (move->getY() == 1) || (move->getY()) == 6)
+				score += 20;
+		}
         //Adding in consideration to number of moves available
         //fprintf(stderr, "Mobility Factor: %d\n", mobilityFactor(tempBoard, side));
-        score += 3 * mobilityFactor(tempBoard, side);
+        //score += 3 * mobilityFactor(tempBoard, side); 
 
 	}
 	else
@@ -343,11 +361,11 @@ int Player::heuristic(Move* move, Side side, Board* originalBoard)
 
 	delete tempBoard;
 	
-	
-    if(side == mySide)
+    /*if(side == mySide)
 	   return (score);
     else
-        return (-1 * score); 
+        return (-1 * score); */
+    return score;
 }
 
 Side Player::flip(Side side)
