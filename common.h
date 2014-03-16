@@ -19,14 +19,14 @@ public:
 
     int getX() { return x; }
     int getY() { return y; }
-    int getScore() { return score; }
+    double getScore() { return score; }
 
     void setX(int x) { this->x = x; }
     void setY(int y) { this->y = y; }
-    void setScore(int score) { this->score = score; }
+    void setScore(double score) { this->score = score; }
 
 private:
-    int score;
+    double score;
 };
 
 struct DecisionTreeNode

@@ -45,7 +45,18 @@ bool Board::onBoard(int x, int y) {
     return(0 <= x && x < 8 && 0 <= y && y < 8);
 }
 
- 
+//Must check if spot is occupied first
+Side Board::getColor(int x,int y) 
+{	
+	if (black[x + 8*y])
+	{
+		return BLACK;
+	}
+	else
+	{
+		return WHITE;
+	}
+}
 /*
  * Returns true if the game is finished; false otherwise. The game is finished 
  * if neither side has a legal move.

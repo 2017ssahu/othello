@@ -8,8 +8,17 @@
 #include <list>
 using namespace std;
 
-class Player {
+int weights[64] = {4,-3,2,2,2,2,-3,4,
+-3,-4,-1,-1,-1,-1,-4,-3,
+2,-1,1,0,0,1,-1,2,
+2,-1,0,1,1,0,-1,2,
+2,-1,0,1,1,0,-1,2,
+2,-1,1,0,0,1,-1,2,
+-3,-4,-1,-1,-1,-1,-4,-3,
+4,-3,2,2,2,2,-3,4}; 
 
+class Player {
+    
 public:
     Player(Side side);
     ~Player();
@@ -21,15 +30,17 @@ public:
     void setBoard(Board* board);
 
 private:
-    int temp;
     Side mySide;
     Side opponentSide;
     Board* masterBoard;
+      
+
     Move* randomMove();
     Move* simpleHeuristicMove();
     std::list<Move*>* possibleMoves(Board* tempBoard,Side side);
     int mobilityFactor(Board* tempBoard, Side side);
-    int heuristic(Move* move,Side side,Board* originalBoard);
+    double heuristic(Move* move,Side side,Board* originalBoard);
+    int heuristicOld(Move* move,Side side,Board* originalBoard);
     void printTree(std::list<DecisionTreeNode*>* childrenList);
     Move* miniMaxMove();
     Move* miniMaxMove(int depth);

@@ -1,4 +1,5 @@
 #include "player.h"
+#define ndx(obj,i,j,n)      (obj[(i)+(j)*n])
 /*
  * Constructor for the player; initialize everything here. The side your AI is
  * on (BLACK or WHITE) is passed in as "side". The constructor must finish 
@@ -7,7 +8,6 @@
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
     testingMinimax = false;
-    temp = 0;
 	this->mySide = side;
     this->opponentSide = BLACK;
     
@@ -17,14 +17,12 @@ Player::Player(Side side) {
     }
 
     masterBoard = new Board();
-
     /* 
      * TODO: Do any initialization you need to do here (setting up the board,
      * precalculating things, etc.) However, remember that you will only have
      * 30 seconds.
      */
 }
-
 /*
  * Destructor for the player.
  */
@@ -55,6 +53,16 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 		masterBoard->doMove(opponentsMove,opponentSide);
 	}
 	
+	/*for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			fprintf(stderr,"%d\t",ndx(weights,i,j,8));
+		}
+		
+		fprintf(stderr,"\n");
+	} */
+	
     //Determine move 
     return miniMaxMove(4);
 }
@@ -66,7 +74,7 @@ Move* Player::miniMaxMove(int depth)
 	std::list<Move*>* moveList = possibleMoves(masterBoard,mySide);
 	DecisionTreeNode* parentNode = NULL;
 	
-	if (moveList == NULL)
+	if (moveList->empty())
 	{
 		return NULL;
 	}
@@ -101,15 +109,15 @@ void Player::miniMaxMove(int depth,Board* board, Side side, DecisionTreeNode* no
 		board->doMove(move,flip(side));
 		std::list<Move*>* moveList = possibleMoves(board,side);
 		
-		if (moveList == NULL) //Perhaps modify possibleMoves and use .isEmpty() instead
+		if (moveList->empty()) //Perhaps modify possibleMoves and use .isEmpty() instead
 		{
 			if (side == mySide)
 			{
-				move->setScore(-1000);
+				move->setScore(-100);
 			}
 			else
 			{
-				move->setScore(1000);
+				move->setScore(100);
 			}
 		}
 		else
@@ -151,7 +159,7 @@ Move* Player::miniMaxMove()
 	std::list<Move*>* masterMoveList = possibleMoves(tempBoard,mySide);
 	DecisionTreeNode* parentNode = NULL;
 	
-	if (masterMoveList == NULL)	//Return NULL if there are no moves to be made
+	if (masterMoveList->empty())	//Return NULL if there are no moves to be made
 	{
 		return NULL;
 	}
@@ -172,7 +180,7 @@ Move* Player::miniMaxMove()
 		
 		std::list<Move*>* secondMoveList = possibleMoves(secondLevel,opponentSide);
 		
-		if (secondMoveList != NULL)
+		if (!secondMoveList->empty())
 		{
 			std::list<DecisionTreeNode*>* secondChildrenList = new std::list<DecisionTreeNode*>();
 			
@@ -221,7 +229,7 @@ Move* Player::miniMaxMove()
 		std::list<DecisionTreeNode*>* secondChildren = (*i)->getChildren();
 		Board* tempSecondBoard = tempBoard->copy();
 		
-		if (secondChildren != NULL)
+		if (!secondChildren->empty())
 		{
 			//For every second level child
 			for (std::list<DecisionTreeNode*>::iterator j = secondChildren->begin(); j != secondChildren->end(); j++)
@@ -247,10 +255,10 @@ Move* Player::miniMaxMove()
  */ 
 std::list<Move*>* Player::possibleMoves(Board* tempBoard,Side side)
 {
-	if (!tempBoard->hasMoves(side))
+	/*if (!tempBoard->hasMoves(side))
 	{
 		return NULL;
-	}
+	} */
 	
     std::list<Move*>* possibleMoves = new std::list<Move*>();
     Move* iteratorMove = new Move(0,0);
@@ -306,13 +314,72 @@ int Player::mobilityFactor(Board* tempBoard,Side side)
     return mobilityFactor;
 } 
 
+double Player::heuristic(Move* move, Side side, Board* originalBoard)
+{
+	Board* nextBoard = originalBoard->copy();
+	nextBoard->doMove(move,side);
+	
+	int myCoins = nextBoard->count(mySide);
+	int opponentCoins = nextBoard->count(opponentSide);
+	
+	std::list<Move*>* myMoveList = possibleMoves(nextBoard,mySide);
+	std::list<Move*>* opponentMoveList = possibleMoves(nextBoard,opponentSide);
+	int myMoves = myMoveList->size();
+	int opponentMoves = opponentMoveList->size();
+	delete myMoveList;
+	delete opponentMoveList;
+	
+	int myStability = 0;
+	int opponentStability = 0;
+	
+	for (int i = 0; i < 8; i++)	//Check who owns what pieces and where
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			if (nextBoard->occupied(i,j))
+			{
+				if (nextBoard->getColor(i,j) == mySide)
+				{
+					myStability += ndx(weights,i,j,8);
+				}
+				else
+				{
+					opponentStability += ndx(weights,i,j,8);
+				}
+			}
+		}
+	}
+	
+	//Number of coins relative to opponent
+	double coinParity = 100 * (myCoins - opponentCoins)/(myCoins + opponentCoins);
+	
+	//Mobility relative to opponent
+	double mobility = 0;
+	if ((myMoves + opponentMoves) != 0)
+	{
+		mobility = 100 * (myMoves - opponentMoves)/(myMoves + opponentMoves);
+	}
+	
+	//Corners 
+	//Stability
+	double stability = 0;
+	if ((myStability + opponentStability) != 0)
+	{
+		stability = 100 * (myStability - opponentStability)/(myStability + opponentStability);
+	}
+	
+	return ((coinParity + mobility + stability)/3.0);
+}
+
 /**
  * Returns the score of a a given board position with the move applied to it
  * Adds points for an increase in stones of the player side and for getting
  * corners or sides. Adds penalty for the spots near the corner
  * 
+ * OLD VERSION
+ * 
  */ 
-int Player::heuristic(Move* move, Side side, Board* originalBoard)
+int Player::heuristicOld(Move* move, Side side, Board* originalBoard)
 {
 	int score = 0;
 	Board* tempBoard = originalBoard->copy();	//Copies board and applies move
@@ -434,7 +501,7 @@ void Player::printTree(std::list<DecisionTreeNode*>* childrenList)
 		for (std::list<DecisionTreeNode*>::iterator i = childrenList->begin(); i != childrenList->end(); i++)
 		{
 			DecisionTreeNode* node = (*i);
-			fprintf(stderr, "White Moves: %d,%d\tScore: %d\n",node->getCurrentMove()->getX(),node->getCurrentMove()->getY(),node->getCurrentMove()->getScore());
+			fprintf(stderr, "White Moves: %d,%d\tScore: %f\n",node->getCurrentMove()->getX(),node->getCurrentMove()->getY(),node->getCurrentMove()->getScore());
 			std::list<DecisionTreeNode*>* nextChildrenList = node->getChildren();
 			
 			if (nextChildrenList != NULL)
@@ -442,7 +509,7 @@ void Player::printTree(std::list<DecisionTreeNode*>* childrenList)
 				for (std::list<DecisionTreeNode*>::iterator j = nextChildrenList->begin(); j != nextChildrenList->end(); j++)
 				{
 					DecisionTreeNode* node1 = (*j);
-					fprintf(stderr, "\tBlack Responses: %d,%d\tScore: %d\n",node1->getCurrentMove()->getX(),node1->getCurrentMove()->getY(),node1->getCurrentMove()->getScore());
+					fprintf(stderr, "\tBlack Responses: %d,%d\tScore: %f\n",node1->getCurrentMove()->getX(),node1->getCurrentMove()->getY(),node1->getCurrentMove()->getScore());
 					std::list<DecisionTreeNode*>* thirdChildrenList  = node1->getChildren();
 				
 					if (thirdChildrenList != NULL)
@@ -450,7 +517,7 @@ void Player::printTree(std::list<DecisionTreeNode*>* childrenList)
 						for (std::list<DecisionTreeNode*>::iterator k = thirdChildrenList->begin(); k != thirdChildrenList->end(); k++)
 						{
 							DecisionTreeNode* node2 = (*k);
-							fprintf(stderr, "\t\tWhite Responses: %d,%d\tScore: %d\n",node2->getCurrentMove()->getX(),node2->getCurrentMove()->getY(),node2->getCurrentMove()->getScore());
+							fprintf(stderr, "\t\tWhite Responses: %d,%d\tScore: %f\n",node2->getCurrentMove()->getX(),node2->getCurrentMove()->getY(),node2->getCurrentMove()->getScore());
 							std::list<DecisionTreeNode*>* fourthChildrenList  = node2->getChildren();
 				
 							if (fourthChildrenList != NULL)
@@ -458,7 +525,7 @@ void Player::printTree(std::list<DecisionTreeNode*>* childrenList)
 								for (std::list<DecisionTreeNode*>::iterator l = fourthChildrenList->begin(); l != fourthChildrenList->end(); l++)
 								{
 									DecisionTreeNode* node3 = (*l);
-									fprintf(stderr, "\t\t\tBlack Responses: %d,%d\tScore: %d\n",node3->getCurrentMove()->getX(),node3->getCurrentMove()->getY(),node3->getCurrentMove()->getScore());
+									fprintf(stderr, "\t\t\tBlack Responses: %d,%d\tScore: %f\n",node3->getCurrentMove()->getX(),node3->getCurrentMove()->getY(),node3->getCurrentMove()->getScore());
 								}
 							}
 							else
