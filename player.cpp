@@ -1,4 +1,5 @@
 #include "player.h"
+#include "weights.h"
 #define ndx(obj,i,j,n)      (obj[(i)+(j)*n])
 /*
  * Constructor for the player; initialize everything here. The side your AI is
