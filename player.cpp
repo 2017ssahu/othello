@@ -83,7 +83,11 @@ Move* Player::miniMaxMove(int depth)
 	Move* chosenMove = (findMax(childrenList))->getCurrentMove();
 	masterBoard->doMove(chosenMove,mySide);
 	//printTree(childrenList);
-	return (chosenMove);
+    
+    delete moveList; //Freeing Memory
+    delete childrenList; //Freeing Memory
+	
+    return (chosenMove);
 }
 
 //Recursive Minimax algorithm
@@ -128,8 +132,13 @@ void Player::miniMaxMove(int depth,Board* board, Side side, DecisionTreeNode* no
 			{
 				move->setScore(findMin(childrenList)->getCurrentMove()->getScore());
 			}
+
+            delete childrenList; //Freeing Memory
+
 		}
-		
+
+        delete moveList; //Freeing Memory
+
 	}
 }
 	
