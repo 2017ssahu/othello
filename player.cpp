@@ -83,7 +83,7 @@ Move* Player::miniMaxMove(int depth)
 	
 	Move* chosenMove = (findMax(childrenList))->getCurrentMove();
 	masterBoard->doMove(chosenMove,mySide);
-	//printTree(childrenList);
+	//printTree(childrenList);m
     
     delete moveList; //Freeing Memory
     delete childrenList; //Freeing Memory
