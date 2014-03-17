@@ -61,6 +61,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 //This is the helper function that goes on to call the recursive miniMax
 Move* Player::miniMaxMove(int depth)
 {
+	double alpha = -100.0;
+	double beta = 100.0;
+	
 	std::list<DecisionTreeNode*>* childrenList = new std::list<DecisionTreeNode*>();
 	std::list<Move*>* moveList = possibleMoves(masterBoard,mySide);
 	DecisionTreeNode* parentNode = NULL;
@@ -77,14 +80,14 @@ Move* Player::miniMaxMove(int depth)
 		childrenList->push_back(nextNode);	
 		Board* boardCopy = masterBoard->copy();
 		boardCopy->doMove(*i,mySide);
-		miniMaxMove(depth-1,boardCopy,opponentSide,nextNode); //depth,board for move,side,parent
+		miniMaxMove(depth-1,boardCopy,opponentSide,nextNode,alpha,beta); //depth,board for move,side,parent
 		//This should create tree with nextNode as its parent
 	}
 	
 	Move* chosenMove = (findMax(childrenList))->getCurrentMove();
 	masterBoard->doMove(chosenMove,mySide);
-	//printTree(childrenList);m
-    
+	//printTree(childrenList);
+	
     delete moveList; //Freeing Memory
     delete childrenList; //Freeing Memory
 	
@@ -92,54 +95,80 @@ Move* Player::miniMaxMove(int depth)
 }
 
 //Recursive Minimax algorithm
-void Player::miniMaxMove(int depth,Board* board, Side side, DecisionTreeNode* node)
+double Player::miniMaxMove(int depth,Board* board, Side side, DecisionTreeNode* node, double alpha, double beta)
 {
-	Move* move = node->getCurrentMove();
+	Move* move = node->getCurrentMove(); //Retrieve move from node
 	
-	if (depth == 0)
+	if (depth == 0)	//Base case, evaluate heuristic and return
 	{
-		move->setScore(heuristic(flip(side),board));
+		double score = heuristic(flip(side),board); 
+		move->setScore(score);
+		return score;
 	}
 	else
 	{
-		board->doMove(move,flip(side));
-		std::list<Move*>* moveList = possibleMoves(board,side);
+		std::list<Move*>* moveList = possibleMoves(board,side);	//populate possible moves
 		
-		if (moveList->empty()) 
+		if (moveList->empty()) 	//No more moves? Evaluate heuristic and return
 		{
-			move->setScore(heuristic(flip(side),board));
+			double score = heuristic(flip(side),board); 
+			move->setScore(score);
+			delete moveList;
+			return score;
 		}
 		else
 		{
 			std::list<DecisionTreeNode*>* childrenList = new std::list<DecisionTreeNode*>();
-			
-			for (std::list<Move*>::iterator i = moveList->begin(); i != moveList->end(); i++)
-			{
-				DecisionTreeNode* nextNode = new DecisionTreeNode(node,*i);
-				childrenList->push_back(nextNode);	
-				Board* boardCopy = board->copy();
-				boardCopy->doMove(*i,side);
-				miniMaxMove(depth-1,boardCopy,flip(side),nextNode); //depth,move,board for move,side,parent
-				//This should create tree with nextNode as its parent
-			}
-			
-			node->addChildren(childrenList);
-			
+			//Setup up childrenList variable
 			if (side == mySide)
 			{
-				move->setScore(findMax(childrenList)->getCurrentMove()->getScore());
+				for (std::list<Move*>::iterator i = moveList->begin(); i != moveList->end(); i++)
+				{
+					DecisionTreeNode* nextNode = new DecisionTreeNode(node,*i);
+					childrenList->push_back(nextNode);	
+					
+					Board* boardCopy = board->copy();
+					boardCopy->doMove(*i,side);
+					alpha = max(alpha,miniMaxMove(depth-1,boardCopy,flip(side),nextNode,alpha,beta)); 
+					//This should create tree with nextNode as its parent
+					
+					if (beta <= alpha) //Player has made mistake, do not consider further
+					{
+						break;
+					}
+				}
+				
+				node->addChildren(childrenList);	//Setup in case we wish to use the tree later
+				move->setScore(alpha);
+				delete moveList;
+				return alpha;
 			}
-			else
+			else  		//Same as before except for minimizing player
 			{
-				move->setScore(findMin(childrenList)->getCurrentMove()->getScore());
+				for (std::list<Move*>::iterator i = moveList->begin(); i != moveList->end(); i++)
+				{
+					DecisionTreeNode* nextNode = new DecisionTreeNode(node,*i);
+					childrenList->push_back(nextNode);	
+					
+					Board* boardCopy = board->copy();
+					boardCopy->doMove(*i,side);
+					beta = min(beta,miniMaxMove(depth-1,boardCopy,flip(side),nextNode,alpha,beta)); 
+					//This should create tree with nextNode as its parent
+					
+					if (beta <= alpha) //Player has made mistake, do not need to consider
+					{
+						break;
+					}
+				}
+				
+				node->addChildren(childrenList);
+				move->setScore(beta);
+				delete moveList; //Free memory
+				return beta;
 			}
 
-            delete childrenList; //Freeing Memory
-
+            //delete childrenList; //Freeing Memory
 		}
-
-        delete moveList; //Freeing Memory
-
 	}
 }
 	
@@ -305,6 +334,29 @@ DecisionTreeNode* Player::findMax (std::list<DecisionTreeNode*>* list)
     return max;
 }
 
+double Player::max(double one, double two)
+{
+	if (one > two)
+	{
+		return one;
+	}
+	else
+	{
+		return two;
+	}
+}
+
+double Player::min(double one, double two)
+{
+	if (one < two)
+	{
+		return one;
+	}
+	else
+	{
+		return two;
+	}
+}
 /**
  * Sets masterBoard to the board passed as parameter. Used to test minimax
  * 
