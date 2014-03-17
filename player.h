@@ -38,11 +38,8 @@ private:
     Move* randomMove();
     Move* simpleHeuristicMove();
     std::list<Move*>* possibleMoves(Board* tempBoard,Side side);
-    int mobilityFactor(Board* tempBoard, Side side);
-    double heuristic(Move* move,Side side,Board* originalBoard);
-    int heuristicOld(Move* move,Side side,Board* originalBoard);
+    double heuristic(Side side,Board* originalBoard);
     void printTree(std::list<DecisionTreeNode*>* childrenList);
-    Move* miniMaxMove();
     Move* miniMaxMove(int depth);
     void miniMaxMove(int depth, Board* previousBoard,Side side, DecisionTreeNode* parentNode);
     Side flip(Side side);
