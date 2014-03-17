@@ -172,6 +172,12 @@ double Player::heuristic(Side side, Board* nextBoard)
 	
 	int myStability = 0;
 	int opponentStability = 0;
+    int myCorners = 0;
+    int opponentCorners = 0;
+    int myInnerCorners = 0;
+    int opponentInnerCorners = 0;
+    int myAdjacentCorners = 0;
+    int opponentAdjacentCorners = 0;
 	
 	for (int i = 0; i < 8; i++)	//Check who owns what pieces and where
 	{
@@ -182,10 +188,34 @@ double Player::heuristic(Side side, Board* nextBoard)
 				if (nextBoard->getColor(i,j) == mySide)
 				{
 					myStability += ndx(weights,i,j,8);
+                    if ((i == 0 && j == 0) || (i == 7 && j == 0) || (i == 0 && j == 7) || (i == 7 && j == 7))
+                    {
+                        myCorners++;
+                    }
+                    if ((i == 1 && j == 1) || (i == 6 && j == 1) || (i == 1 && j == 6) || (i == 6 && j == 6))
+                    {
+                        myInnerCorners++;
+                    }
+                    if ((i == 1 && j == 0) || (i == 0 && j == 1) || (i == 1 && j == 7) || (i == 0 && j == 6) || (i == 7 && j == 1) || (i == 6 && j == 0) || (i == 7 && j == 6) || (i == 6 && j == 7))
+                    {
+                        myAdjacentCorners++;
+                    }
 				}
 				else
 				{
 					opponentStability += ndx(weights,i,j,8);
+                    if ((i == 0 && j == 0) || (i == 7 && j == 0) || (i == 0 && j == 7) || (i == 7 && j == 7))
+                    {
+                        opponentCorners++;
+                    }
+                    if ((i == 1 && j == 1) || (i == 6 && j == 1) || (i == 1 && j == 6) || (i == 6 && j == 6))
+                    {
+                        opponentInnerCorners++;
+                    }
+                    if ((i == 1 && j == 0) || (i == 0 && j == 1) || (i == 1 && j == 7) || (i == 0 && j == 6) || (i == 7 && j == 1) || (i == 6 && j == 0) || (i == 7 && j == 6) || (i == 6 && j == 7))
+                    {
+                        opponentAdjacentCorners++;
+                    }
 				}
 			}
 		}
@@ -201,7 +231,10 @@ double Player::heuristic(Side side, Board* nextBoard)
 		mobility = 100 * (myMoves - opponentMoves)/(myMoves + opponentMoves);
 	}
 	
-	//Corners 
+	//Corners relative to opponent
+    double corners = 25 * myCorners - 25 * opponentCorners;
+    double innerCorners = -25 * myInnerCorners + 25 * opponentInnerCorners;
+    double adjacentCorners = -12.5 * myAdjacentCorners + 12.5 * opponentAdjacentCorners;
 	//Stability
 	double stability = 0;
 	if ((myStability + opponentStability) != 0)
@@ -209,7 +242,7 @@ double Player::heuristic(Side side, Board* nextBoard)
 		stability = 100 * (myStability - opponentStability)/(myStability + opponentStability);
 	}
 	
-	return ((coinParity + mobility + stability)/3.0);
+	return ((coinParity + 2 * mobility + 2 * stability + 4 * corners + 3 * innerCorners + 2 * adjacentCorners)/14.0);
 }
 
 
