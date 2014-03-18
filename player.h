@@ -25,17 +25,17 @@ private:
     Side opponentSide;
     Board* masterBoard;
       
-
-    Move* randomMove();
-    Move* simpleHeuristicMove();
     std::list<Move*>* possibleMoves(Board* tempBoard,Side side);
     double heuristic(Side side,Board* originalBoard);
     void printTree(std::list<DecisionTreeNode*>* childrenList);
     Move* miniMaxMove(int depth);
-    void miniMaxMove(int depth, Board* previousBoard,Side side, DecisionTreeNode* parentNode);
+    double miniMaxMove(int depth, Board* previousBoard,Side side, DecisionTreeNode* parentNode,double alpha,double beta);
     Side flip(Side side);
     DecisionTreeNode* findMax (std::list<DecisionTreeNode*>* list);
     DecisionTreeNode* findMin (std::list<DecisionTreeNode*>* list);
+    double max(double one, double two);
+    double min(double one, double two);	
+
 };
 
 #endif

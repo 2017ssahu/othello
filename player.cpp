@@ -61,6 +61,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 //This is the helper function that goes on to call the recursive miniMax
 Move* Player::miniMaxMove(int depth)
 {
+	double alpha = -100.0;
+	double beta = 100.0;
+	
 	std::list<DecisionTreeNode*>* childrenList = new std::list<DecisionTreeNode*>();
 	std::list<Move*>* moveList = possibleMoves(masterBoard,mySide);
 	DecisionTreeNode* parentNode = NULL;
@@ -77,14 +80,14 @@ Move* Player::miniMaxMove(int depth)
 		childrenList->push_back(nextNode);	
 		Board* boardCopy = masterBoard->copy();
 		boardCopy->doMove(*i,mySide);
-		miniMaxMove(depth-1,boardCopy,opponentSide,nextNode); //depth,board for move,side,parent
+		miniMaxMove(depth-1,boardCopy,opponentSide,nextNode,alpha,beta); //depth,board for move,side,parent
 		//This should create tree with nextNode as its parent
 	}
 	
 	Move* chosenMove = (findMax(childrenList))->getCurrentMove();
 	masterBoard->doMove(chosenMove,mySide);
-	//printTree(childrenList);m
-    
+	//printTree(childrenList);
+	
     delete moveList; //Freeing Memory
     delete childrenList; //Freeing Memory
 	
@@ -92,54 +95,80 @@ Move* Player::miniMaxMove(int depth)
 }
 
 //Recursive Minimax algorithm
-void Player::miniMaxMove(int depth,Board* board, Side side, DecisionTreeNode* node)
+double Player::miniMaxMove(int depth,Board* board, Side side, DecisionTreeNode* node, double alpha, double beta)
 {
-	Move* move = node->getCurrentMove();
+	Move* move = node->getCurrentMove(); //Retrieve move from node
 	
-	if (depth == 0)
+	if (depth == 0)	//Base case, evaluate heuristic and return
 	{
-		move->setScore(heuristic(flip(side),board));
+		double score = heuristic(flip(side),board); 
+		move->setScore(score);
+		return score;
 	}
 	else
 	{
-		board->doMove(move,flip(side));
-		std::list<Move*>* moveList = possibleMoves(board,side);
+		std::list<Move*>* moveList = possibleMoves(board,side);	//populate possible moves
 		
-		if (moveList->empty()) 
+		if (moveList->empty()) 	//No more moves? Evaluate heuristic and return
 		{
-			move->setScore(heuristic(flip(side),board));
+			double score = heuristic(flip(side),board); 
+			move->setScore(score);
+			delete moveList;
+			return score;
 		}
 		else
 		{
 			std::list<DecisionTreeNode*>* childrenList = new std::list<DecisionTreeNode*>();
-			
-			for (std::list<Move*>::iterator i = moveList->begin(); i != moveList->end(); i++)
-			{
-				DecisionTreeNode* nextNode = new DecisionTreeNode(node,*i);
-				childrenList->push_back(nextNode);	
-				Board* boardCopy = board->copy();
-				boardCopy->doMove(*i,side);
-				miniMaxMove(depth-1,boardCopy,flip(side),nextNode); //depth,move,board for move,side,parent
-				//This should create tree with nextNode as its parent
-			}
-			
-			node->addChildren(childrenList);
-			
+			//Setup up childrenList variable
 			if (side == mySide)
 			{
-				move->setScore(findMax(childrenList)->getCurrentMove()->getScore());
+				for (std::list<Move*>::iterator i = moveList->begin(); i != moveList->end(); i++)
+				{
+					DecisionTreeNode* nextNode = new DecisionTreeNode(node,*i);
+					childrenList->push_back(nextNode);	
+					
+					Board* boardCopy = board->copy();
+					boardCopy->doMove(*i,side);
+					alpha = max(alpha,miniMaxMove(depth-1,boardCopy,flip(side),nextNode,alpha,beta)); 
+					//This should create tree with nextNode as its parent
+					
+					if (beta <= alpha) //Player has made mistake, do not consider further
+					{
+						break;
+					}
+				}
+				
+				node->addChildren(childrenList);	//Setup in case we wish to use the tree later
+				move->setScore(alpha);
+				delete moveList;
+				return alpha;
 			}
-			else
+			else  		//Same as before except for minimizing player
 			{
-				move->setScore(findMin(childrenList)->getCurrentMove()->getScore());
+				for (std::list<Move*>::iterator i = moveList->begin(); i != moveList->end(); i++)
+				{
+					DecisionTreeNode* nextNode = new DecisionTreeNode(node,*i);
+					childrenList->push_back(nextNode);	
+					
+					Board* boardCopy = board->copy();
+					boardCopy->doMove(*i,side);
+					beta = min(beta,miniMaxMove(depth-1,boardCopy,flip(side),nextNode,alpha,beta)); 
+					//This should create tree with nextNode as its parent
+					
+					if (beta <= alpha) //Player has made mistake, do not need to consider
+					{
+						break;
+					}
+				}
+				
+				node->addChildren(childrenList);
+				move->setScore(beta);
+				delete moveList; //Free memory
+				return beta;
 			}
 
-            delete childrenList; //Freeing Memory
-
+            //delete childrenList; //Freeing Memory
 		}
-
-        delete moveList; //Freeing Memory
-
 	}
 }
 	
@@ -172,6 +201,14 @@ double Player::heuristic(Side side, Board* nextBoard)
 {
 	int myCoins = nextBoard->count(mySide);
 	int opponentCoins = nextBoard->count(opponentSide);
+    if (opponentCoins == 0)
+    {
+        return 100;
+    }
+    else if (myCoins == 0)
+    {
+        return -100;
+    }
 	
 	std::list<Move*>* myMoveList = possibleMoves(nextBoard,mySide);
 	std::list<Move*>* opponentMoveList = possibleMoves(nextBoard,opponentSide);
@@ -188,6 +225,8 @@ double Player::heuristic(Side side, Board* nextBoard)
     int opponentInnerCorners = 0;
     int myAdjacentCorners = 0;
     int opponentAdjacentCorners = 0;
+    int myEdges = 0;
+    int opponentEdges = 0;
 	
 	for (int i = 0; i < 8; i++)	//Check who owns what pieces and where
 	{
@@ -202,14 +241,16 @@ double Player::heuristic(Side side, Board* nextBoard)
                     {
                         myCorners++;
                     }
-                    if ((i == 1 && j == 1) || (i == 6 && j == 1) || (i == 1 && j == 6) || (i == 6 && j == 6))
+                    else if ((i == 1 && j == 1) || (i == 6 && j == 1) || (i == 1 && j == 6) || (i == 6 && j == 6))
                     {
                         myInnerCorners++;
                     }
-                    if ((i == 1 && j == 0) || (i == 0 && j == 1) || (i == 1 && j == 7) || (i == 0 && j == 6) || (i == 7 && j == 1) || (i == 6 && j == 0) || (i == 7 && j == 6) || (i == 6 && j == 7))
+                    else if ((i == 1 && j == 0) || (i == 0 && j == 1) || (i == 1 && j == 7) || (i == 7 && j == 1) || (i == 0 && j == 6) || (i == 6 && j == 0) || (i == 7 && j == 6) || (i == 6 && j == 7))
                     {
                         myAdjacentCorners++;
                     }
+                    else if (i == 0 || i == 7 || j == 0 || j == 7)
+                        myEdges++;
 				}
 				else
 				{
@@ -218,14 +259,16 @@ double Player::heuristic(Side side, Board* nextBoard)
                     {
                         opponentCorners++;
                     }
-                    if ((i == 1 && j == 1) || (i == 6 && j == 1) || (i == 1 && j == 6) || (i == 6 && j == 6))
+                    else if ((i == 1 && j == 1) || (i == 6 && j == 1) || (i == 1 && j == 6) || (i == 6 && j == 6))
                     {
                         opponentInnerCorners++;
                     }
-                    if ((i == 1 && j == 0) || (i == 0 && j == 1) || (i == 1 && j == 7) || (i == 0 && j == 6) || (i == 7 && j == 1) || (i == 6 && j == 0) || (i == 7 && j == 6) || (i == 6 && j == 7))
+                    else if ((i == 1 && j == 0) || (i == 0 && j == 1) || (i == 1 && j == 7) || (i == 0 && j == 6) || (i == 7 && j == 1) || (i == 6 && j == 0) || (i == 7 && j == 6) || (i == 6 && j == 7))
                     {
                         opponentAdjacentCorners++;
                     }
+                    else if (i == 0 || i == 7 || j == 0 || j == 7)
+                        opponentEdges++;
 				}
 			}
 		}
@@ -245,14 +288,22 @@ double Player::heuristic(Side side, Board* nextBoard)
     double corners = 25 * myCorners - 25 * opponentCorners;
     double innerCorners = -25 * myInnerCorners + 25 * opponentInnerCorners;
     double adjacentCorners = -12.5 * myAdjacentCorners + 12.5 * opponentAdjacentCorners;
-	//Stability
+	
+    //Stability
 	double stability = 0;
 	if ((myStability + opponentStability) != 0)
 	{
 		stability = 100 * (myStability - opponentStability)/(myStability + opponentStability);
 	}
-	
-	return ((coinParity + 2 * mobility + 2 * stability + 4 * corners + 3 * innerCorners + 2 * adjacentCorners)/14.0);
+
+    //Edge Pieces
+    double edge = 0;
+    if ((myEdges + opponentEdges) != 0)
+    {
+        edge = 100 * (myEdges - opponentEdges)/(myEdges + opponentEdges);
+    }
+
+    return ((coinParity + 0 * edge + 2 * mobility + 2 * stability + 4 * corners + 3 * innerCorners + 2 * adjacentCorners) / 14.0);
 }
 
 
@@ -305,6 +356,29 @@ DecisionTreeNode* Player::findMax (std::list<DecisionTreeNode*>* list)
     return max;
 }
 
+double Player::max(double one, double two)
+{
+	if (one > two)
+	{
+		return one;
+	}
+	else
+	{
+		return two;
+	}
+}
+
+double Player::min(double one, double two)
+{
+	if (one < two)
+	{
+		return one;
+	}
+	else
+	{
+		return two;
+	}
+}
 /**
  * Sets masterBoard to the board passed as parameter. Used to test minimax
  * 
